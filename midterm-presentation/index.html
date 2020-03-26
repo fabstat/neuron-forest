@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <title>Markov Random Fields: Quantifying Neuronal Spikes and Forest Fires</title>
+    <title>The (Markov) Hidden Connection</title>
 
     <link rel="stylesheet" href="css/reveal.css">
     <link rel="stylesheet" href="css/theme/black.css">
@@ -24,29 +24,205 @@
   <body>
     <div class="reveal">
       <div class="slides">
-	<section>
 	  <section data-background-image="img/neurons.gif" data-background-opacity=".4">
-	    <h4>Markov Random Fields: Quantifying Neuronal Spikes and Forest Fires</h4>
+	    <h4>The (Markov) Hidden Connection: Quantifying Neuronal Spikes and Forest Fires</h4>
 	    <small>by Fabiana Ferracina and Jacob Pennington (WSU Vancouver)</small>
-	      <p class="fragment">Our goal is to apply Markov Random Fields to the problem of image segmentation for the purpose of classifying neuronal activity and detecting forest fires.</p>
+	  </section>
+	  <section data-background-image="img/forest-fire.gif" data-background-opacity=".3">
+	  <h4>The Hidden Connection: What we will cover</h4>
+	  <ul>
+	    <li class="fragment">Introduction</li>
+	    <li class="fragment">Background and Motivation</li>
+	    <li class="fragment">DTMC and HMM</li>
+	    <li class="fragment">Application: Forest Fire Detection</li>
+	    <li class="fragment">Model Implementation</li>
+	    <li class="fragment">Preliminary Results</li>
+	    <li class="fragment">Work in Progress</li>
+	  </ul>
+	  </section>
+	  <section>
+	<section>
+	  <h4>Introduction</h4>
+	  <p>Our project is inspired by the idea that one can relate forest fires to neuronal spikes as a process transitioning between three states:</p>
+	  <ul>
+	    <li class="fragment">Active ($a$): neurons spiking $\rightarrow$ trees burning,</li>
+	    <li class="fragment">Refractory ($r$): a neuron that just spiked $\rightarrow$ a burnt tree, and</li>
+	    <li class="fragment">Quiescent ($q$): a neuron that is ready to fire $\rightarrow$ a new or recovered tree.</li>
+	  </ul>
 	</section>
-	  <section data-background-image="img/fmri.jpg" data-background-opacity=".3">
-	    <p>Researchers have shown that the MRF model can spatially quantify neuronal activity data:</p>
-	    <img src="img/mrf-neurons-a.png" width="409px"> <img src="img/mrf-neurons.png" width="470px">
-	    <span class="fragment">Further exploration of model assumptions is necessary in order to apply it to in vivo or ex vivo imaging data.</span>
+	<section data-background-image="img/calcium.png" data-background-opacity=".3">
+	   <blockquote>
+	  &ldquo; Our goal is to use a unified hidden Markov model (HMM) to classify the behaviors exhibited by both neuronal activity and forest fire spread. In particular, we are interested in inferring the systems’ switches between critical states. We aim to use satellite and remote sensed images of forest fires as well as images of neuronal activity obtained via in-vivo two-photon calcium imaging. &rdquo;
+	  </blockquote>
 	  </section>
-	  <section data-background-image="img/WA2015Fires.jpg" data-background-opacity=".6">
-	    <p>In Ecology, MRFs can be used on remote sensing and satellite imagery in order to classify land types and detect forest fires.</p>
-	    <img src="img/landtypes.png" width="600px">
 	  </section>
-	  <section data-background-image="img/WA2015Fires.jpg" data-background-opacity=".6">
-	    <img src="img/landtypes.png" width="600px">
-	    <p>With respect to fire, patches of land are much like neurons which with repect to firing can be active, refractory, or quiescent.</p>
+	  <section>
+	  <section>
+	    <h4>Background and Motivation</h4>
+	    <p>When Jack Cowan, a neuroscience researcher at the University of Chicago came up with the relationship between forests fires and neuronal spikes, he must have been reading the works of Per Bak on self-organized criticality.</p>
 	  </section>
-	</section>
-	<section data-background-image="img/forest-fire.gif" data-background-opacity=".3">
+	  <section>
+	    <h4>Self-Organized Criticality</h4>
+	    <p>This unseeming connection between two disparate phenomena, neuronal spiking and forest fires, might be hidden in the dynamics of the tiny particles that compose matter.</p>
+	    <p class="fragment">About 30 ya, Per Bak, a Danish theoretical physicist, came up with the idea of dynamical systems naturally evolving to a critical state.</p>
+	  </section>
+	  <section data-background-image="img/sand.gif" data-background-opacity=".2">
+	    <h4>Self-Organized Criticality</h4>
+	    <p>Self-organized criticality is the process in which the behavior of extended dissipative systems assumes a critical steady state independent of the initial state and without tuning of parameters to a special value.</p>
+	  </section>
+	  <section>
+	    Cowan in the same work with Benayoun et al. (2010) derived the master equation governing the stochastic evolution of the states of a network of $k$ active excitatory and $l$ active inhibitory neuron clusters, an "ancestral" dynamic to fire spread that has not yet been borrowed to explain and predict the spread of fire in a two-dimensional lattices.
+	  </section>
+	  </section>
+	  <section>
+	    <section>
+	      <h4>DTMC</h4>
+	      <p>Let $X_n$ be a discrete random variable defined on the finite state space $\{a, r, q\}$ such that the probability to transition from any state $i$ to a new state $j$ is $P(X_{n+1} = j\ | \ X_n = i) = p_{ji}$.</p>
+	    <img src="img/dtmc.png" width="400px">
+	  </section>
+	    <section data-transition="fade-out" data-background-image="img/waldo.jpg" data-background-opacity=".15">
+	      <h4>HMM</h4>
+	      <p>A hidden Markov model is a discrete-time finite state homogeneous Markov chain observed through a discrete-time channel characterized by a finite set of transition densities that are indexed by the states of the Markov chain.</p>
+	      <p class="fragment">The underlying process is not observable and referred to as the regime. The second process is a sequence of independent random variables that are conditional on the underlying Markov chain.</p>
+	    </section>
+	    <section data-transition="fade-in">
+	      <h4>HMM</h4>
+	       <p class="fragment">The value obtained from the distribution of each random variable depends on the Markov chain at that time. They form the observation sequence (Ephraim and Merhav, 2002).</p>
+	    <img class="fragment" src="img/hmm.png" width="400px">
+	    </section>
+	    <section>
+	      <h4>HMM Ingredients</h4>
+	      <ul>
+		<li class="fragment">An observation sequence of length $T$: $\{\mathcal{O}\}_{n=0}^{T-1}$,</li>
+		<li class="fragment">An $N \times N$ matrix of state transition probabilities $P$,</li>
+		<li class="fragment">An $N \times M$ matrix of observation probabilities $B$, and</li>
+		<li class="fragment">An $N \times 1$ vector of initial state probabilities $\pi$.</li>
+		</ul>
+	    </section>
+	    <section>
+	      <h4>The Problem</h4>
+	      <p>Given an observation sequence $\{\mathcal{O}\}_{n=0}^{T-1}$, the number of states we wish to describe $N = 3$, and a number $M$ of observed symbols (from our image data), we wish to find the model $\lambda = (P, B, \pi)$ that maximizes the likelihood of the given observation sequence.</p>
+	    </section>
+	    <section>
+	      <h4>Solution: The Baum-Welch Algorithm</h4>
+	      <ol>
+		<li class="fragment">Begin with a model $\lambda$ (random or predefined),</li>
+		<li class="fragment">Run the observation sequence through the current model to estimate the expectations of each
+model parameter,</li>
+		<li class="fragment">Change the model to maximize the values of the frequent paths (expectation maximization),</li>
+		<li class="fragment">Go back to step 2 and repeat until the (local) maximum has been reached, or close enough.</li>
+		</ol>
+	      </section>
+	  </section>
+	  <section>
+	    <section data-background-image="img/russia.jpg" data-background-opacity=".4">
+	      <h2>Forest Fire Detection</h2>
+	      </section>
+	    <section>
+	      <h4>The Data</h4>
+	      <p>Somewhere in the West Amazon in 2018</p>
+	      <img src="img/fire2018.png" width="500px">
+	    </section>
+	    <section data-background-image="img/terra.png" data-background-opacity=".3">
+	      <h4>The Data</h4>
+	      <p>NASA's Terra satellite flies by</p>
+	      <img src="img/bolivia2018.gif" width="300px">
+	    </section>
+	    <section>
+	      <p>The image data will be used for training and validation on our model. They are processed as follows:</p>
+	      <ol>
+		<li class="fragment">Treat all pixels labeled as either "water" or "not enough data" as equivalent to "no burn".</li>
+		<li class="fragment">Collapse the color axis by summing, so that all days of the month on which fires occurred are treated roughly equally.</li>
+		<li class="fragment">Cut out a neighborhood of size $r$ extending out from a point of interest, resulting in a square array with shape $(2r + 1, 2r + 1)$.</li>
+	      </ol>
+	      </section>
+	      <section>
+		<ol start=4>
+		<li>Compute the mean over the entire neighborhood, representing the density of fires in the surrounding area over the month.</li>
+		<li class="fragment">Set a threshold equal to the 50th percentile of the means (over all images). Images with a processed mean that is less than or equal to this threshold are labeled "no fire", while all other images are labeled "fire".</li>
+		</ol>
+		</section>
+		<section>
+		  <img src="img/proc_output.png" width="800px">
+		  </section>
+	    </section>
+	    <section>
+	    <section>
+	      <h4>Implementation</h4>
+	      <p>Initial Pre-chosen Values:</p>
+	      $$\pi = \begin{pmatrix}0.005\\0.005\\0.990\end{pmatrix},
+	      \ P = \begin{pmatrix}0.050 & 0.010 & 0.045\\0.900 & 0.190 & 0.005\\0.050 & 0.800 & 0.950\end{pmatrix},$$
+	      <br>
+	      $$B = \begin{pmatrix}0.1 & 0.9\\0.9 & 0.1\\0.9 & 0.1\end{pmatrix}.$$
+	    </section>
+	    <section data-background-image="img/python.jpg" data-background-opacity=".4">
+	      <pre>
+		<code class="hljs" data-trim contenteditable>
+class Node():
+    def __init__(self, initial_distribution, transition_matrix):
+       self.initial_distribution = initial_distribution
+       self.transition_matrix = transition_matrix
+       self.state = self._sample_state(self.initial_distribution)
+    def transition(self):
+       distribution = self.transition_matrix[:, self.state]
+       self.state = self._sample_state(distribution)
+    def _sample_state(self, distribution):
+       arq = np.random.sample(1)
+       if arq <= distribution[0]:
+           state = 0
+       elif arq <= distribution[0] + distribution[1]:
+           state = 1
+       else:
+           state = 2
+       return state
+		</code>
+	      </pre>
+	    <i>coded in Python 3</i>
+	      </section>
+	    </section>
+	    <section>
+	      <section>
+		<h4>Preliminary Results</h4>
+		<p>We trained the forest model’s parameters on a small NASA MODIS Image dataset using our HMM implementation.</p>
+	      </section>
+	      <section>
+		<p>The algorithm was used to optimize the transition matrix, initial state distribution, and state-conditional observation distributions which converged to the following:</p>
+		 <pre>
+		   <code class="hljs" data-trim contenteditable>
+    initial_state_distribution = np.array([0.0, 0.0, 1.0])
+    transition_matrix =          np.array([[0.667, 0.000, 0.200],
+                                           [0.333, 0.667, 0.000],
+                                           [0.000, 0.333, 0.800]])
+    observation_distributions =  np.array([[0.000, 1.000],
+                                           [0.000, 1.000],
+                                           [1.000, 0.000]])
+		     </code>
+	      </pre>
+	      </section>
+	      <section>
+		<p>Using these parameters, we generated ten single-node simulations each over 12 time steps:</p>
+		<img src="img/forest_single_fit.png" width="600px">
+		</section>
+		  
+	    </section>
+	    <section>
+	      <section>
+		<h4>Work in Progress</h4>
+		<ul>
+		  <li>Infer spiking activity from two-photo calcium data: obtain and process image data.</li>
+		  <li class="fragment">Infer the presence of forest fires based on satellite images:</li>
+		  <ul>
+		    <li class="fragment">use higher spatial and temporal resolution images,</li>
+		    <li class="fragment">uncollapse burn date and make it more useful data for the model,</li>
+		    <li class="fragment">use the burn date uncertainty layer in our model.</li>
+		  </ul>
+		  <li class="fragment">Incorporate spatial information by fitting a model for each node individually.</li>
+		  </ul>
+	      </section>
+	    </section>
+	<section data-background-image="img/yellow.jpg" data-background-opacity=".3">
 	  <h1>Sources</h1>
-	  <a href="https://github.com/nitrofix/neuron-forest/tree/master/proposal/sources" target="_blank">Relevant papers and references</a>
+	  <a href="https://github.com/nitrofix/neuron-forest/tree/master/midterm-presentation/sources" target="_blank">Relevant papers and references</a>
 	</section>
       </div>
     </div>
