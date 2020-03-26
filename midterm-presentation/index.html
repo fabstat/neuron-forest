@@ -151,13 +151,12 @@ model parameter,</li>
 	      <h4>Implementation</h4>
 	      <p>Initial Pre-chosen Values:</p>
 	      $$\pi = \begin{pmatrix}0.005\\0.005\\0.990\end{pmatrix},
-	      \ P = \begin{pmatrix}0.050 & 0.010 & 0.045\\0.900 & 0.190 & 0.005\\0.050 & 0.800 & 0.950\end{pmatrix},$$
+	      \ P = \begin{pmatrix}0.50 & 0.01 & 0.09\\0.25 & 0.90 & 0.01\\0.25 & 0.09 & 0.90\end{pmatrix},$$
 	      <br>
 	      $$B = \begin{pmatrix}0.1 & 0.9\\0.9 & 0.1\\0.9 & 0.1\end{pmatrix}.$$
 	    </section>
 	    <section data-background-image="img/python.jpg" data-background-opacity=".4">
-	      <pre>
-		<code class="hljs" data-trim contenteditable>
+	      <pre><code class="hljs" data-trim>
 class Node():
     def __init__(self, initial_distribution, transition_matrix):
        self.initial_distribution = initial_distribution
@@ -175,9 +174,8 @@ class Node():
        else:
            state = 2
        return state
-		</code>
-	      </pre>
-	    <i>coded in Python 3</i>
+		</code></pre>
+	      <img class="fragment" src="img/forest_single_sim.png" width="500px">
 	      </section>
 	    </section>
 	    <section>
@@ -187,17 +185,10 @@ class Node():
 	      </section>
 	      <section>
 		<p>The algorithm was used to optimize the transition matrix, initial state distribution, and state-conditional observation distributions which converged to the following:</p>
-		 <pre>
-		   <code class="hljs" data-trim contenteditable>
-    initial_state_distribution = np.array([0.0, 0.0, 1.0])
-    transition_matrix =          np.array([[0.667, 0.000, 0.200],
-                                           [0.333, 0.667, 0.000],
-                                           [0.000, 0.333, 0.800]])
-    observation_distributions =  np.array([[0.000, 1.000],
-                                           [0.000, 1.000],
-                                           [1.000, 0.000]])
-		     </code>
-	      </pre>
+		 $$\pi = \begin{pmatrix}0.0\\0.0\\1.0\end{pmatrix},
+	      \ P = \begin{pmatrix}0.667 & 0.000 & 0.200\\0.333 & 0.667 & 0.000\\0.000 & 0.333 & 0.800\end{pmatrix},$$
+	      <br>
+	      $$B = \begin{pmatrix}0.0 & 1.0\\0.0 & 1.0\\1.0 & 0.0\end{pmatrix}.$$
 	      </section>
 	      <section>
 		<p>Using these parameters, we generated ten single-node simulations each over 12 time steps:</p>
