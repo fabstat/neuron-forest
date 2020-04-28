@@ -55,10 +55,15 @@
 	  <h4>The Data</h4>
 	  <ul>
 	    <li class="fragment">NASA's satellites Aqua and Terra payload MODIS, as before.</li>
-	    <li class="fragment">Lower spatial resolution than before: 1 km per pixel.</li>
+	    <li class="fragment">Lower spatial resolution than before: 1 km$^2$ per pixel.</li>
 	    <li class="fragment">But we get more frequent images! 1 for each day of the year.</li>
 	    <li class="fragment">The place is still the Western Amazon. Two data sets: 2010 and 2019.</li>
 	  </ul>
+	</section>
+		<section data-background-image="img/data.jpeg" data-background-opacity=".2" data-transition="fade-in">
+	  <h4>The Data</h4>
+	  <img src="img/bolivia2010.gif" width="300px">
+	  <p>The higher temporal resolution makes the data is too sparse. Thus we decreased it to 5 days per time step. We also decreased the spatial to 10 km$^2/$pixel.</p>
 	  </section>
 	  </section>
 	  <section>
@@ -75,8 +80,9 @@
 	   <section data-transition="fade-in">
 	      <h4>How Transitions Work</h4>
 	       <p>As an example consider a node $C$ with transition probabilities matrix $P_0$ at time $t=0$.</p>
-	       <img src="img/model.jpg" width="550px">
-	       <p class="fragment">If $C$ is adjacent to two active nodes at $t=0$, then at $t=1$ its transition probalities matrix becomes $P_1$.</p>
+	       <div><img src="img/model.jpg" width="450px">
+	       <small><i>(multipliers for $[a \rightarrow a]$ and $[q \rightarrow a]$ are 1.2 and 2.0, respectively.)</i></small></div>
+	      <p>If $C$ is adjacent to two active nodes at $t=0$, then at $t=1$ its transition probalities matrix becomes $P_1$.</p>
 	    </section>
 	  </section>
 	  <section>
@@ -99,26 +105,40 @@
 	       <p>We run a Monte Carlo simulation to find the $(\alpha, \beta)$ pair that minimizes the mean squared error (MSE) of the fire density in our training dataset. For example, here are 25 such pairs and their corresponding MSE's:</p>
 	        <img src="img/mse.png" width="550px">
 	     </section>
+	     <section>
+	       <h4>Fitted Transition Probabilities</h4>
+	       <img src="img/fitted_transitions.png" width="800px">
+	       </section>
 	     <section  data-transition="fade-in">
 	       <h4>Results</h4>
-	       <p>$\alpha = 1, \beta = 1$: No spatial influence.</p>
+	       <p>$\alpha = 1, \beta = 10$: adjacent quiecents get more affected.</p>
 	       <img src="img/a1b1.gif" width="400px">
 	     </section>
 	     <section  data-transition="fade-in">
 	       <h4>Results</h4>
-	       <p>$\alpha = 2, \beta = 2$: Doing better!</p>
+	       <p>$\alpha = 2, \beta = 10$: active nodes and adjacent quiecents get more affected.</p>
+	       <img src="img/a2b1.gif" width="400px">
+	     </section>
+	     <section  data-transition="fade-in">
+	       <h4>Results</h4>
+	       <p>$\alpha = 2, \beta = 2$: active nodes and adjacent quiecents get more affected.</p>
 	       <img src="img/a2b2.gif" width="400px">
 	     </section>
 	     <section  data-transition="fade-in">
 	       <h4>Results</h4>
-	       <p>$\alpha = 2, \beta = 1$: Doing best!</p>
-	       <img src="img/a2b1.gif" width="400px">
+	       <p>$\alpha = 1, \beta = 2$: best multipliers.</p>
+	       <img src="img/a1b2.gif" width="400px">
+	     </section>
+	     <section>
+	       <h4>Results</h4>
+	       <p>However, we still have a long way to go...</p>
+	       <img src="img/fireds.png" width="800px">
 	       </section>
 	  </section>
 	  <section>
 	    <section data-background-image="img/firetruck.jpeg" data-background-opacity=".2">
 	      <h4>Importance</h4>
-	      <p>If we can predict fire spread and magniture from earlier remote sensed data:</p>
+	      <p>If we can predict fire spread and magnitude from earlier remote sensed data:</p>
 	      <ul>
 		<li class="fragment"> We can fight it with the appropriate response later.</li>
 		<li class="fragment"> We can investigate problem areas and come up with mitigation responses.</li>
