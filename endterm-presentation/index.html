@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>The (Markov) Hidden Connection</title>
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/black.css">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+	  <section data-background-image="img/neurons.gif" data-background-opacity=".4">
+	    <h4>The (Markov) Hidden Connection: Quantifying Neuronal Spikes and Forest Fires</h4>
+	    <small>by Fabiana Ferracina and Jacob Pennington (WSU Vancouver)</small>
+	  </section>
+	  <section data-background-image="img/forest-fire.gif" data-background-opacity=".3">
+	  <h4>The Hidden Connection: What we will cover</h4>
+	  <ul>
+	    <li class="fragment">Review</li>
+	    <li class="fragment">Network Model</li>
+	    <li class="fragment">$\alpha$'s, $\beta$'s, MSE's and Results</li>
+	    <li class="fragment">Importance</li>
+	  </ul>
+	  </section>
+	  <section>
+	<section>
+	  <h4>Previously in Hidden Connections</h4>
+	  <p>Inspired by the idea that one can relate forest fires to neuronal spikes.</p>
+	  <ul>
+	    <li class="fragment">DTMC with three states: active, refractory, quiescent.</li>
+	    <li class="fragment">HMM with observed thermal readings labeled fire or no fire.</li>
+	    <li class="fragment">We have a transition prob. matrix $P$, a observed$\rightarrow$state prob. matrix $B$ and an initial state vector $\pi$.</li>
+	    <li class="fragment">We wish to find the model $\lambda = (P, B, \pi)$ that maximizes the likelihood of the given observation sequence.</li>
+	  </ul>
+	</section>
+	<section data-background-image="img/data.jpeg" data-background-opacity=".2">
+	  <h4>The Data</h4>
+	  <ul>
+	    <li class="fragment">NASA's satellites Aqua and Terra payload MODIS, as before.</li>
+	    <li class="fragment">Lower spatial resolution than before: 1 km per pixel.</li>
+	    <li class="fragment">But we get more frequent images! 1 for each day of the year.</li>
+	    <li class="fragment">The place is still the Western Amazon. Two data sets: 2010 and 2019.</li>
+	  </ul>
+	  </section>
+	  </section>
+	  <section>
+	  <section>
+	    <h4>The Network Model</h4>
+	    <p></p>
+	    <img src="img/model1.jpg" width="500px">
+	  </section>
+	  <section data-transition="fade-in">
+	      <h4>A Network of HMMs</h4>
+	       <p>Each node in the network is an HMM like decribed before.</p>
+	    <img src="img/model1.jpg" width="350px">&nbsp;<img src="img/hmm.png" width="458px">
+	  </section>
+	   <section data-transition="fade-in">
+	      <h4>How Transitions Work</h4>
+	       <p>As an example consider a node $C$ with transition probabilities matrix $P_0$ at time $t=0$.</p>
+	       <img src="img/model.jpg" width="550px">
+	       <p class="fragment">If $C$ is adjacent to two active nodes at $t=0$, then at $t=1$ its transition probalities matrix becomes $P_1$.</p>
+	    </section>
+	  </section>
+	  <section>
+	     <section>
+	      <h4>HMM Implementation: Same as Before</h4>
+	      <p>Initial Pre-chosen Values:</p>
+	      $$\pi = \begin{pmatrix}0.005\\0.005\\0.990\end{pmatrix},
+	      \ P = \begin{pmatrix}0.50 & 0.01 & 0.09\\0.25 & 0.90 & 0.01\\0.25 & 0.09 & 0.90\end{pmatrix},$$
+	      <br>
+	      $$B = \begin{pmatrix}0.1 & 0.9\\0.9 & 0.1\\0.9 & 0.1\end{pmatrix}.$$
+	      <p class="fragment">Solve for $\lambda$ with Baum-Welch algorithm.</p>
+	    </section>
+	    <section data-background-image="img/active.jpeg" data-background-opacity=".2">
+	      <h4>$\alpha$'s, $\beta$'s and MSE's</h4>
+	      <p>However, within a spatial 2D network, we further update the transition probabilities matrix $P$ for each node in the network (e.g a patch of land), at each time step, conditional on the states of the neighboring nodes.</p>
+	      <p class="fragment">These updates occur as newly introduced weights $\alpha$ and $\beta$, which are applied to the states $a \rightarrow a$ and $q \rightarrow a$ of the transition matrix $P$ for each node at each time step.</p>
+	    </section>
+	     <section>
+	       <h4>Wait!...the MSE's?</h4>
+	       <p>We run a Monte Carlo simulation to find the $(\alpha, \beta)$ pair that minimizes the mean squared error (MSE) of the fire density in our training dataset. For example, here are 25 such pairs and their corresponding MSE's:</p>
+	        <img src="img/mse.png" width="550px">
+	     </section>
+	     <section  data-transition="fade-in">
+	       <h4>Results</h4>
+	       <p>$\alpha = 1, \beta = 1$: No spatial influence.</p>
+	       <img src="img/a1b1.gif" width="400px">
+	     </section>
+	     <section  data-transition="fade-in">
+	       <h4>Results</h4>
+	       <p>$\alpha = 2, \beta = 2$: Doing better!</p>
+	       <img src="img/a2b2.gif" width="400px">
+	     </section>
+	     <section  data-transition="fade-in">
+	       <h4>Results</h4>
+	       <p>$\alpha = 2, \beta = 1$: Doing best!</p>
+	       <img src="img/a2b1.gif" width="400px">
+	       </section>
+	  </section>
+	  <section>
+	    <section data-background-image="img/firetruck.jpeg" data-background-opacity=".2">
+	      <h4>Importance</h4>
+	      <p>If we can predict fire spread and magniture from earlier remote sensed data:</p>
+	      <ul>
+		<li class="fragment"> We can fight it with the appropriate response later.</li>
+		<li class="fragment"> We can investigate problem areas and come up with mitigation responses.</li>
+		<li class="fragment"> If we can modify the vegetation in order to prevent large escalations.</li>
+		<li class="fragment"> We can evacuate animal and human inhabitants before it is too late.</li>
+		</ul>
+	    </section>
+	    <section data-background-image="img/amazon.jpeg" data-background-opacity=".3">
+	      <h2>Thank you!</h2>
+	    </section>
+	    </section>
+      </div>
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <script>
+      // More info about config & dependencies:
+      // - https://github.com/hakimel/reveal.js#configuration
+      // - https://github.com/hakimel/reveal.js#dependencies
+      Reveal.initialize({
+      autoPlayMedia: true,
+      math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_HTML-full'  // See http://docs.mathjax.org/en/latest/config-files.html
+      },
+	  chalkboard: {
+		// optionally load pre-recorded chalkboard drawing from file
+		src: "chalkboard.json",
+	},
+      dependencies: [
+      { src: 'plugin/markdown/marked.js' },
+      { src: 'plugin/markdown/markdown.js' },
+      { src: 'plugin/notes/notes.js', async: true },
+      { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+	  { src: 'plugin/math/math.js', async: true },
+	  { src: 'plugin/chalkboard/chalkboard.js' }
+      ],
+	  keyboard: {
+	    67: function() { RevealChalkboard.toggleNotesCanvas() },	// toggle notes canvas when 'c' is pressed
+	    66: function() { RevealChalkboard.toggleChalkboard() },	// toggle chalkboard when 'b' is pressed
+	    46: function() { RevealChalkboard.clear() },	// clear chalkboard when 'DEL' is pressed
+	     8: function() { RevealChalkboard.reset() },	// reset chalkboard data on current slide when 'BACKSPACE' is pressed
+	    68: function() { RevealChalkboard.download() },	// downlad recorded chalkboard drawing when 'd' is pressed
+	    88: function() { RevealChalkboard.colorNext() },	// cycle colors forward when 'x' is pressed
+	    89: function() { RevealChalkboard.colorPrev() },	// cycle colors backward when 'y' is pressed
+	}
+      });
+    </script>
+  </body>
+</html>
